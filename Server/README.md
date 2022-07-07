@@ -1,6 +1,10 @@
 <h3>Available Scripts</h3>
 <br />
 
+<p>Install React App</p>
+<code>npm install</code>
+<br />
+<br />
 <p>In the project directory, you can run:</p>
 <br />
 <code>npm start</code>
