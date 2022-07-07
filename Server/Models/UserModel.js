@@ -1,0 +1,12 @@
+const {Schema, model} = require("mongoose")
+
+const UserSchema = new Schema({
+    id: String,
+    firstname: String,
+    lastname: String,
+    phoneNumber: String,
+    age: String,
+    gender: String
+})
+
+module.exports = model('user', UserSchema)
