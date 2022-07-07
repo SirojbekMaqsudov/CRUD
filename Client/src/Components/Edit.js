@@ -26,7 +26,7 @@ const Edit = () => {
     })
 
     useEffect(() => {
-        axios.get(`https://merncrudheroku.herokuapp.com/user/${id}`).then(({data}) => {
+        axios.get(`http://localhost:5000/user/${id}`).then(({data}) => {
             setUser(data)
             setValues({...data})
         })
@@ -38,9 +38,22 @@ const Edit = () => {
             [e.target.name]: e.target.value
         })
     }
+
     const handleSubmit = (e) => {
         e.preventDefault()
-        axios.put(`https://merncrudheroku.herokuapp.com/user/update/${id}`, {...values}).then(({data}) => {
+        const image = document.querySelector('#file')
+
+        const formData = new FormData()
+
+        formData.append('firstname', values.firstname)
+        formData.append('lastname', values.lastname)
+        formData.append('phoneNumber', values.phoneNumber)
+        formData.append('age', values.age)
+        formData.append('gender', values.gender)
+
+        formData.append('avatar', image.files[0])
+
+        axios.put(`http://localhost:5000/user/update/${id}`, formData).then(({data}) => {
             const {error} = data
             if (error){
                 return toast.error(error, {
@@ -65,6 +78,9 @@ const Edit = () => {
                                   value={values.phoneNumber} onChange={handleChange}/>
                     <Form.Control placeholder={'Age'} className='mt-3' name={'age'} value={values.age}
                                   onChange={handleChange}/>
+
+                    <Form.Control type={'file'} id={'file'} className={'mt-3'} />
+
                     <Form.Select className='mt-3' name='gender' onChange={handleChange} defaultValue={values.gender}>
                         {values.gender === 'male' ? (
                             <>

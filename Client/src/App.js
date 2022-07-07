@@ -8,6 +8,7 @@ import Registration from "./Components/Registration";
 import Dashboard from "./Components/Dashboard";
 import Logout from "./Components/Logout";
 import Edit from "./Components/Edit";
+import UserPage from "./Components/userPage";
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                 <Route path={'/registration'} element={<Registration />}/>
                 <Route path={'/dashboard'} element={<Dashboard />}/>
                 <Route path={'/edit/:id'} element={<Edit />}/>
+                <Route path={'/user/:id'} element={<UserPage />}/>
                 <Route path={'/logout'} element={<Logout />}/>
             </Routes>
         </BrowserRouter>

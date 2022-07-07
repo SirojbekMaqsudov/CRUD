@@ -4,7 +4,6 @@ const dotenv = require("dotenv").config()
 const cors = require("cors")
 
 const authRouter = require("./Routes/AuthRouter")
-const blogRouter = require('./Routes/BlogRouter')
 const userRouter = require("./Routes/userRouter")
 
 const app = express()
@@ -16,10 +15,10 @@ mongoose.connect(process.env.DB_URL).then(() => console.log("Connected"))
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use(express.static(__dirname + '/Uploads'))
 
 //Routes
 app.use("/auth", authRouter)
-app.use("/blogs", blogRouter)
 app.use('/user', userRouter)
 
 app.listen(PORT, () => {

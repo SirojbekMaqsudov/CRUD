@@ -1,11 +1,14 @@
 const User = require("../Models/UserModel")
 const Validate = require("../Validators/userValidate")
 const uuid = require('uuid')
+const fs = require("fs")
+const path = require("path")
 
 class UserController {
     async Create(req, res) {
         try {
             const {firstname, lastname, phoneNumber, age, gender} = req.body
+            const avatar = req.file
 
             const {error} = Validate(req.body)
 
@@ -19,13 +22,13 @@ class UserController {
                 lastname,
                 phoneNumber,
                 age,
-                gender
+                gender,
+                avatar: avatar ? avatar.filename : 'User.png'
             })
 
             const savedUser = await user.save()
 
             return res.json(savedUser)
-
         } catch (e) {
             console.log(e)
         }
@@ -34,6 +37,8 @@ class UserController {
     async Update(req, res) {
         try {
             const {firstname, lastname, phoneNumber, age, gender} = req.body
+            const avatar = req.file
+
             const id = req.params.id
 
             const user = await User.findOne({id})
@@ -46,13 +51,20 @@ class UserController {
                 lastname: lastname ? lastname : user.lastname,
                 phoneNumber: phoneNumber ? phoneNumber : user.phoneNumber,
                 age: age ? age : user.age,
-                gender: gender ? gender : user.gender
+                gender: gender ? gender : user.gender,
+                avatar: avatar ? avatar.filename : user.avatar
             }
 
             const {error} = Validate(data)
 
             if (error) {
                 return res.json({error: error.details[0].message})
+            }
+
+            if (avatar && user.avatar !== 'User.png'){
+                fs.unlink(path.resolve(__dirname, '../', 'Uploads', user.avatar), (err) => {
+                    if (err) console.log(err)
+                })
             }
 
             const updatedUser = await User.findOneAndUpdate({id}, data)
@@ -70,10 +82,24 @@ class UserController {
     }
 
     async Delete(req, res) {
-        const {id} = req.params
+        try{
+            const {id} = req.params
 
-        const user = await User.deleteOne({id})
-        return res.json(user)
+            const userData = await User.findOne({id})
+
+            if (userData){
+                if (userData.avatar !== 'User.png'){
+                    fs.unlink(path.resolve(__dirname, '../', 'Uploads', userData.avatar), (err) => {
+                        if (err) console.log(err)
+                    })
+                }
+            }
+            const user = await User.deleteOne({id})
+
+            return res.json(user)
+        }catch (e) {
+            console.log(e)
+        }
     }
 
     async FindOne(req, res) {

@@ -5,7 +5,8 @@ const UserSchema = Joi.object({
     lastname: Joi.string().min(3).required(),
     phoneNumber: Joi.string().required(),
     age: Joi.string().required(),
-    gender: Joi.string().required()
+    gender: Joi.string().required(),
+    avatar: Joi.any()
 })
 
 module.exports = data => UserSchema.validate(data)

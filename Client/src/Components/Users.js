@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Form, Modal, Table} from "react-bootstrap";
+import {Button, Col, Form, Modal, Row, Table} from "react-bootstrap";
 import axios from "axios";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPen, faTrash} from '@fortawesome/free-solid-svg-icons'
+import {faPen, faTrash, faEye} from '@fortawesome/free-solid-svg-icons'
 import {toast, ToastContainer} from "react-toastify";
 import {useNavigate} from "react-router-dom";
 
@@ -10,6 +10,7 @@ const Users = () => {
     const navigate = useNavigate()
     const [users, setUsers] = useState([])
     const [show, setShow] = useState(false);
+
     const [values, setValues] = useState({
         firstname: '',
         lastname: '',
@@ -22,7 +23,7 @@ const Users = () => {
     const handleShow = () => setShow(true);
 
     useEffect(() => {
-        axios.get('https://merncrudheroku.herokuapp.com/user').then(({data}) => {
+        axios.get('http://localhost:5000/user').then(({data}) => {
             setUsers(data)
         })
     })
@@ -36,7 +37,20 @@ const Users = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        axios.post('https://merncrudheroku.herokuapp.com/user/create', {...values}).then(({data}) => {
+
+        const image = document.querySelector('#avatar')
+
+        const formData = new FormData();
+
+        formData.append('firstname', values.firstname)
+        formData.append('lastname', values.lastname)
+        formData.append('phoneNumber', values.phoneNumber)
+        formData.append('age', values.age)
+        formData.append('gender', values.gender)
+
+        formData.append('avatar', image.files[0])
+
+        axios.post('http://localhost:5000/user/create', formData).then(({data}) => {
             const {error} = data
             if (error){
                 return toast.error(error, {
@@ -45,13 +59,20 @@ const Users = () => {
                     position: "bottom-right"
                 })
             }
+            setValues({
+                firstname: '',
+                lastname: '',
+                phoneNumber: '',
+                age: '',
+                gender: "male"
+            })
 
             handleClose()
         })
     }
 
     const handleDelete = (id) => {
-        axios.delete(`https://merncrudheroku.herokuapp.com/user/delete/${id}`).then(({data}) => {
+        axios.delete(`http://localhost:5000/user/delete/${id}`).then(({data}) => {
             console.log(data)
         })
     }
@@ -68,11 +89,12 @@ const Users = () => {
                     <Modal.Title>Add User</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form onSubmit={handleSubmit}>
+                    <Form onSubmit={handleSubmit} encType={'multipart/form-data'}>
                         <Form.Control placeholder={'Firstname'} className='mt-3' name={'firstname'} value={values.firstname} onChange={handleChange}/>
                         <Form.Control placeholder={'LastName'} className='mt-3' name={'lastname'} value={values.lastname} onChange={handleChange}/>
                         <Form.Control placeholder={'Phone Number'} className='mt-3' name={'phoneNumber'} value={values.phoneNumber} onChange={handleChange}/>
                         <Form.Control placeholder={'Age'} className='mt-3' name={'age'} value={values.age} onChange={handleChange} />
+                        <Form.Control placeholder={'Avatar'} className='mt-3' type={'file'} id={'avatar'} />
                         <Form.Select className='mt-3' name='gender' onChange={handleChange} defaultValue={values.gender} required={true}>
                             <option value="male">male</option>
                             <option value="female">female</option>
@@ -88,8 +110,13 @@ const Users = () => {
                     </Form>
                 </Modal.Body>
             </Modal>
-
-            <Table striped bordered hover variant="dark" className='mt-5'>
+            <Row className='mt-5'>
+                <Col md={6}></Col>
+                <Col md={6}>
+                    <Form.Control placeholder={'Filter'} />
+                </Col>
+            </Row>
+            <Table striped bordered hover variant="dark" className='mt-2'>
                 <thead>
                 <tr>
                     <th>#</th>
@@ -111,6 +138,7 @@ const Users = () => {
                             <td>{item.age}</td>
                             <td>{item.gender}</td>
                             <td className='Buttons'>
+                                <Button variant={'success'} onClick={() => navigate(`/user/${item.id}`)}><FontAwesomeIcon icon={faEye} /></Button>
                                 <Button variant={'primary'} onClick={() => navigate(`/edit/${item.id}`)}><FontAwesomeIcon icon={faPen} /></Button>
                                 <Button variant={'danger'} onClick={() => handleDelete(item.id)}><FontAwesomeIcon icon={faTrash} /></Button>
                             </td>

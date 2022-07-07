@@ -20,7 +20,7 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault()
 
-        axios.post('https://merncrudheroku.herokuapp.com/auth/login', {username, password}).then(({data}) => {
+        axios.post('http://localhost:5000/auth/login', {username, password}).then(({data}) => {
             const {error} = data
 
             if (error) {
